@@ -26,7 +26,7 @@ const AGENT_DATA = {
     prenom: "Louis",
     nomComplet: "Louis PETITCOLIN",
     telephone: "07 59 59 92 97",
-    photo: "/LOGO_BLEU.png",
+    photo: "/photoLouis.jpg",
     titre: "Co-fondateur MERINO",
   },
 };
