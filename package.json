@@ -1,0 +1,14 @@
+{
+  "name": "site-vitrine-jordane",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "jordanetunnel"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace jordanetunnel",
+    "build": "npm run build --workspace jordanetunnel",
+    "start": "npm run start --workspace jordanetunnel",
+    "lint": "npm run lint --workspace jordanetunnel"
+  }
+}
