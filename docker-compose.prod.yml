@@ -1,0 +1,27 @@
+services:
+  vendreavecmerino:
+    build: .
+    container_name: vendreavecmerino
+    restart: unless-stopped
+    expose:
+      - "3000"
+    networks:
+      - traefik_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.merino.rule=Host(`vendreavecmerino.com`) || Host(`www.vendreavecmerino.com`)"
+      - "traefik.http.routers.merino.entrypoints=websecure"
+      - "traefik.http.routers.merino.tls=true"
+      - "traefik.http.routers.merino.tls.certresolver=mytlschallenge"
+      # Redirect www → apex
+      - "traefik.http.middlewares.merino-www.redirectregex.regex=^https://www\\.vendreavecmerino\\.com/(.*)"
+      - "traefik.http.middlewares.merino-www.redirectregex.replacement=https://vendreavecmerino.com/$${1}"
+      - "traefik.http.middlewares.merino-www.redirectregex.permanent=true"
+      - "traefik.http.routers.merino.middlewares=merino-www@docker"
+      - "traefik.http.services.merino.loadbalancer.server.port=3000"
+      - "traefik.docker.network=n8n-stack_default"
+
+networks:
+  traefik_net:
+    external: true
+    name: n8n-stack_default

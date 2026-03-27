@@ -1,0 +1,10 @@
+node_modules
+jordanetunnel/node_modules
+jordanetunnel/.next
+.git
+*.md
+*.pdf
+*.png
+*.jpg
+deploy
+n8n_workflow_merino.json
