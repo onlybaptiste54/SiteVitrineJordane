@@ -21,10 +21,10 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4 md:gap-6">
             <a
-              href="tel:0695067320"
+              href="tel:0759599297"
               className="bg-merino-orange hover:bg-orange-500 text-white font-extrabold py-2 px-6 rounded-full transition-colors text-sm md:text-base mr-2 flex items-center gap-2 shadow-sm"
             >
-              06 95 06 73 20
+              07 59 59 92 97
             </a>
           </div>
         </div>
@@ -40,7 +40,7 @@ export default function Home() {
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-extrabold leading-tight">
-              Vendez <span className="text-merino-orange">Vite</span> et au <span className="text-merino-orange">bon prix</span> avec notre méthode.
+              Vendez <span className="text-merino-orange">vite</span> et au <span className="text-merino-orange">bon prix</span> avec notre méthode.
             </h1>
             
             <p className="text-xl md:text-2xl text-white/90">
@@ -74,9 +74,9 @@ export default function Home() {
 
       <section className="bg-merino-blue-dark border-l-8 border-merino-orange py-12 px-6 shadow-inner">
         <div className="container mx-auto max-w-4xl text-center">
-          <p className="text-xl md:text-2xl text-white font-medium italic">
-            "Si vous êtes arrivé sur ce site, c'est qu'on a identifié que vous aviez un projet de vente. C'est exactement ce qu'on fait pour vendre votre bien : cibler les acheteurs qui cherchent un bien comme le vôtre et vous trouver un acquéreur rapidement."
-          </p>
+            <p className="text-xl md:text-2xl text-white font-medium italic">
+            "Si vous êtes arrivé sur ce site, c'est qu'on a identifié que<span className="text-merino-orange"> vous aviez un projet de vente.</span> C'est exactement ce qu'on fait pour <span className="text-merino-orange">vendre votre bien</span> : cibler les acheteurs qui cherchent un bien comme le vôtre et  <span className="text-merino-orange">vous trouver un acquéreur rapidement.</span>"
+            </p>
         </div>
       </section>
 
@@ -123,7 +123,7 @@ export default function Home() {
               <div className="flex text-yellow-500 mb-4">★★★★★</div>
               <p className="text-gray-700 italic mb-6">"Une vraie différence par rapport aux agences traditionnelles. Grâce à eux, nous avons enfin eu des visites régulières et concrètes."</p>
               <div className="font-bold text-merino-blue-dark">Evelyne H.</div>
-              <div className="text-sm text-gray-500">Grand Nancy</div>
+              <div className="text-sm text-gray-500">Nancy</div>
             </div>
             <div className="bg-white p-8 rounded-2xl shadow-sm">
               <div className="flex text-yellow-500 mb-4">★★★★★</div>
@@ -133,7 +133,7 @@ export default function Home() {
             </div>
             <div className="bg-white p-8 rounded-2xl shadow-sm">
               <div className="flex text-yellow-500 mb-4">★★★★★</div>
-              <p className="text-gray-700 italic mb-6">"Professionnels, disponibles, d'un dynamisme remarquable. Vendu en 3 semaines au prix demandé."</p>
+              <p className="text-gray-700 italic mb-6">"Professionnels, disponibles, d'un dynamisme remarquable. Vendu en 3 semaines au prix annoncé."</p>
               <div className="font-bold text-merino-blue-dark">Sophie M.</div>
               <div className="text-sm text-gray-500">Laneuveville-devant-Nancy</div>
             </div>

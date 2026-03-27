@@ -1,0 +1,349 @@
+MERINO  
+Cahier des charges — Site internet  
+Landing page & tunnel d'estimation  
+ 
+Document préparé par : Jordane MOREL  
+Version : 1.0  ·  Mars 2025  
+ 
+1. Présentation du projet  
+ 
+1.1 Contexte  
+MERINO est une agence immobilière indépendante basée dans le Grand Nancy. Le projet 
+consiste à créer un tunnel de conversion web composé de trois pages, destiné à générer des 
+leads vendeurs qualifiés via des campagnes publicitaires Meta (Facebook / Instagr am). 
+ 
+Ce document décrit les pages à créer, leur contenu, leur logique de fonctionnement, et les 
+spécifications techniques attendues. Il ne couvre pas la stratégie publicitaire Meta ni le suivi post -
+livraison.  
+ 
+1.2 Objectif  
+Convertir un visiteur arrivant d epuis une publicité Meta en lead qualifié : un propriétaire ayant un 
+projet de vente, qui laisse ses coordonnées pour être rappelé par l'un des co -fondateurs de 
+MERINO.  
+ 
+1.3 Intervenants  
+ 
+Rôle Nom Contact  
+Co-fondateur (client)  Jordane MOREL  06 95 06 73 20  
+Co-fondateur  Louis PETITCOLIN  07 59 59 92 97  
+Développeur  À compléter  — 
+ 
+2. Charte graphique  
+ 
+2.1 Typographie  
+Police unique : Rubik (Google Fonts). Charger les graisses 400 (Regular) et 700 (Bold) 
+uniquement.  
+URL d'import : https://fonts.google.com/specimen/Rubik  
+ 
+2.2 Palette de couleurs  
+ 
+Couleur  Usage  Code hex  
+Bleu principal  Header, titres, fonds hero  #3C607C  
+Bleu secondaire  Fonds alternatifs, hover  #57788E  
+Écru Fond page confirmation, sections  #E7DED6  
+Orange  Boutons CTA uniquement  #FB9F73  
+Noir texte  Corps de texte  #1A1A1A  
+Blanc  Texte sur fond bleu, formulaires  #FFFFFF  
+ 
+RÈGLE ABSOLUE : l'orange (#FB9F73) est exclusivement réservé aux boutons call -to-action. Il 
+ne doit jamais être utilisé comme couleur de fond de section.  
+ 
+2.3 Logo  
+Le logo MERINO sera fourni en PNG fond transparent. Placement : en haut à gauche du header 
+sur les trois pages. Largeur maximale recommandée : 140px desktop, 100px mobile.  
+ 
+3. Architecture du tunnel  
+ 
+Le tunnel est composé de trois pages enchaînées :  
+ 
+Page  Description  
+Page 1 — Landing page  Page d'entrée commune. Présentation de l'offre, formulaire 
+d'estimation. Identique pour tous les visiteurs.  
+Page 2 — Chargement  Page intermédiaire affichant une barre de progression pendant 15 
+à 18 secondes. Introduit l'agent qui va rappeler le visiteur.  
+Page 3 — Confirmation  Affiche la fourchette d'estimation, la fiche de l'agent, les boutons 
+de contact, et le guide téléchargeabl e. 
+ 
+3.1 Logique de routage par agent  
+La landing page (Page 1) est commune à tous les visiteurs. En revanche, les pages 2 et 3 
+affichent des informations différentes selon l'agent à l'origine de la publicité qui a amené le 
+visiteur.  
+ 
+Le routage se fait via  un paramètre dans l'URL transmis depuis la publicité Meta :  
+– Publicité de Jordane → URL contient ?agent=jordane  
+– Publicité de Louis → URL contient ?agent=louis  
+ 
+Ce paramètre est lu côté client (JavaScript) et détermine quel agent afficher sur les pages 2 et 3 : 
+photo, prénom, numéro de téléphone, message personnalisé, et vidéo.  
+Le paramètre agent doit être propagé d'une page à l'autre tout au long du tunnel, y com pris lors 
+de la redirection vers la page de confirmation.  
+ 
+4. Page 1 — Landing page  
+ 
+4.1 Objectif  
+Convaincre le visiteur de remplir le formulaire pour obtenir une estimation de son bien. Cette 
+page est identique pour tous les visiteurs.  
+ 
+4.2 Comportement  
+– Pas de menu de navigation  
+– Pas de liens sortants (sauf mentions légales en footer)  
+– Formulaire visible sans scroller sur mobile (priorité absolue)  
+– Un seul bouton CTA dans le header qui ancre vers le formulaire  
+ 
+4.3 Contenu — Header  
+– Logo MERINO à gauche  
+– Numér o de téléphone au centre ou à droite : 06 95 06 73 20 (numéro général de l'agence 
+— à confirmer)  
+– Bouton CTA orange : "Connaître le prix de mon bien" → ancre vers le formulaire  
+ 
+4.4 Contenu — Section hero  
+Fond dégradé bleu (#2A4A60 vers #3C607C). Texte blan c. 
+– Titre H1 : "Vendez votre bien vite et au bon prix."  
+– Sous -titre : "Une estimation gratuite en 2 minutes. On vous rappelle sous 24h."  
+ 
+Statistique affichée sous le sous -titre (format pill/badge, fond semi -transparent) :  
+– Chiffre : 3,3%  
+– Légende : "c'est l'écart moyen constaté entre le prix affiché et le prix signé en France — 
+notre méthode de ciblage vise à réduire cet écart au maximum"  
+Cette statistique doit être affichée en taille plus petite que le titre, en mode discret (badge semi -
+transparent), pas comme une stat hero en grand.  
+ 
+4.5 Contenu — Formulaire  
+Fond blanc, coins arrondis, intégré dans la section hero. Titre du formulaire : "Connaître le prix de 
+mon bien". Sous -titre : "Estimation gratuite · Résultat immédiat".  
+ 
+Champs du form ulaire (tous obligatoires) :  
+– Type de bien (texte libre ou liste déroulante : appartement, maison, terrain…)  
+– Adresse du bien  
+– Surface en m²  
+– Prénom  
+– Téléphone  
+ 
+– Bouton de soumission orange : "Obtenir mon estimation →"  
+– Mention sous le bouton : " 🔒 Gratuit · Sans  engagement · Données sécurisées"  
+ 
+À la soumission du formulaire : redirection vers la Page 2 (chargement), en transmettant le 
+prénom du visiteur et le paramètre agent dans l'URL.  
+ 
+4.6 Contenu — Teaser guide  
+Juste sous le formulaire, dans la section hero, un encadré sobre annonce le guide sans proposer 
+de téléchargement immédiat :  
+– "🔒 Guide offert : Vendre vite et au bon prix"  
+– "Vous pourrez le télécharger gratuitement après votre estimation."  
+Ne pas afficher de bouton de téléchargement sur cette page. Le guide est une récompense de la 
+page de confirmation.  
+ 
+4.7 Contenu — Bandeau proof  
+Section pleine largeur, fond bleu foncé (#2A4A60), bordure gauche orange, texte blanc :  
+"Si vous êtes arrivé su r ce site, c'est qu'on a identifié que vous aviez un projet de vente. C'est 
+exactement ce qu'on fait pour vendre votre bien : cibler les acheteurs qui cherchent un bien 
+comme le vôtre — pour vous trouver un acquéreur rapidement."  
+ 
+4.8 Contenu — La Méthode Merino  
+Section fond légèrement grisé (#F9F7F5). 4 étapes affichées en cards verticales :  
+– Étape 1 — Estimation précise : On analyse votre bien et le marché local pour vous donner 
+une valeur réaliste et argumentée.  
+– Étape 2 — Mise en valeur : Photos professionnelles, visite virtuelle, rédaction de l'annonce 
+— votre bien présenté à son meilleur.  
+– Étape 3 — Diffusion & ciblage : On diffuse votre bien là où se trouvent vos acheteurs — et 
+on cible précisément les profils i ntéressés.  
+– Étape 4 — Accompagnement jusqu'à la signature : Visites, négociation, paperasse, notaire. 
+On gère tout. Vous n'avez qu'à signer.  
+ 
+4.9 Contenu — Témoignages  
+Section fond écru (#E7DED6). 3 avis clients affichés en cards :  
+– Evelyne H. — Grand Nancy : "Une vraie différence par rapport aux agences traditionnelles. 
+Grâce à eux, nous avons enfin eu des visites régulières et concrètes." ★★★★★  
+– Pierre C. — Grand Nancy : "Ils savent utiliser tous les dispositifs et leurs réseaux pour 
+vendre rapidement et au bon prix. Je recommande vivement." ★★★★★  
+– Sophie M. — Grand Nancy : "Professionnels, disponibles, d'un dynamisme remarquable. 
+Vendu en 3 semaines au prix demandé." ★★★★★  
+ 
+4.10 Contenu — CTA final et footer  
+Section CTA : fond bleu, titre blanc "Prêt à vendre  votre bien ?", sous -titre "Estimation gratuite · 
+Rappel sous 24h · Sans engagement", bouton orange "Connaître le prix de mon bien →" qui 
+ancre vers le formulaire.  
+ 
+Footer : fond noir, texte gris clair. Mentions légales, politique de confidentialité, conta ct. "© 2025 
+MERINO — Grand Nancy". "Vos données ne seront jamais transmises à des tiers."  
+ 
+5. Page 2 — Chargement  
+ 
+5.1 Objectif  
+Maintenir l'attention du visiteur pendant le calcul de l'estimation (15 à 18 secondes). Introduire 
+visuellement l'agent qui va le rappeler. À la fin du délai, rediriger automatiquement vers la Page 
+3. 
+ 
+5.2 Comportement  
+– Fond bleu (#3C607C), texte blanc, auc un menu de navigation  
+– Barre de progression animée qui atteint 100% en 15 à 18 secondes  
+– Affichage du pourcentage d'avancement et d'un message de statut changeant (ex : 
+"Analyse du marché…", "Comparaison des biens vendus dans votre secteur…", 
+"Finalisation d e votre estimation…")  
+– Redirection automatique vers la Page 3 à la fin de l'animation  
+ 
+5.3 Contenu — Fiche agent  
+La fiche agent est déterminée par le paramètre ?agent= reçu en URL. Elle affiche :  
+– Photo de l'agent (ronde, bordure orange)  
+– Nom complet de l'age nt 
+– Titre : Co -fondateur MERINO  
+– Espace vidéo : placeholder remplacé par une balise <video> lors de l'intégration des vidéos  
+– Message dynamique : "Pendant ce temps, [Prénom] prépare votre dossier…"  
+ 
+Données par agent :  
+ 
+Champ  Jordane MOREL  Louis 
+PETITCOLIN  
+Photo  jordane.jpg (fournie)  louis.jpg (fournie)  
+Numéro affiché  06 95 06 73 20  07 59 59 92 97  
+Vidéo  À intégrer (placeholder)  À intégrer 
+(placeholder)  
+ 
+6. Page 3 — Confirmation  
+ 
+6.1 Objectif  
+Afficher le résultat de l'estimation sous forme de fourchette indicative, inciter le visiteur à entrer 
+en contact avec l'agent, et lui remettre le guide téléchargeable.  
+ 
+6.2 Comportement  
+– Fond écru (#E7DED6), aucun menu de navigation  
+– Prénom du visiteur pers onnalisé dans le titre si transmis depuis le formulaire  
+– L'agent affiché correspond au paramètre ?agent= reçu en URL  
+– Événement Meta Pixel Lead déclenché au chargement de cette page  
+ 
+6.3 Contenu — Résultat d'estimation  
+Card blanche avec bordure orange. Affic he : 
+– Label : "Fourchette indicative"  
+– Fourchette de prix calculée selon les données du formulaire (voir section 7 — Moteur 
+d'estimation)  
+– Jauge de confiance : barre de couleur dégradée rouge → orange → vert, curseur 
+positionné dans la zone basse/moyenne, lib ellés "Estimation basse" et "Estimation haute"  
+– Mention d'avertissement : " 🔒 Indicatif — une visite permet d'affiner précisément"  
+– Note : "Chaque bien est unique — seule une estimation sur place est vraiment précise."  
+La jauge doit être volontairement posit ionnée dans la zone basse -moyenne pour inciter le visiteur 
+à contacter l'agent afin d'obtenir une estimation plus précise.  
+ 
+6.4 Contenu — Fiche agent et contact  
+Card blanche. Photo de l'agent (ronde, bordure orange), nom, titre "Co -fondateur MERINO", 
+badge  vert "Disponible — rappel sous 24h".  
+ 
+Deux boutons de contact :  
+– Bouton principal orange : " 🔒 Être rappelé(e) par [Prénom]" — lien tel: vers le numéro de 
+l'agent  
+– Bouton secondaire blanc/bleu : " 🔒 Prendre rendez -vous" — lien vers outil de prise de RDV 
+(URL à fournir par MERINO)  
+ 
+Mention sous les boutons : "[Prénom] vous rappelle personnellement sous 24h · Gratuit · Sans 
+engagement"  
+ 
+6.5 Contenu — Guide téléchargeable  
+Card blanche avec bordure orange. Icône 🔒, titre "Guide gratuit : Vendre vite et au bon prix", 
+description courte, bouton bleu "Télécharger le guide →".  
+Le fichier PDF du guide sera fourni par MERINO avant la mise en production. Le bouton 
+déclenche le tél échargement du fichier.  
+ 
+6.6 Contenu — Témoignage et réassurance  
+– Un témoignage client (Pierre C.) affiché en card blanche  
+– Mention de réassurance en bas de page : "Aucun engagement · Échange gratuit · Rappel 
+sous 24h · Vos données ne seront jamais transmise s à des tiers."  
+ 
+7. Moteur d'estimation  
+ 
+7.1 Principe  
+Le moteur d'estimation est un calcul côté client (JavaScript) qui génère une fourchette de prix 
+indicative à partir des données saisies dans le formulaire. Il ne se connecte à aucune API 
+externe.  
+ 
+La fo urchette est calculée à partir d'un prix au m² de référence par type de bien, ajusté par des 
+coefficients selon l'état du bien et le secteur géographique.  
+ 
+7.2 Données d'entrée  
+– Type de bien (appartement, maison, terrain…)  
+– Surface en m²  
+– Adresse (utilisée po ur affichage uniquement à ce stade — pas de géolocalisation 
+automatique)  
+ 
+7.3 Logique de calcul  
+Prix de base = surface × prix_m2_reference[type_bien]  
+Prix bas = prix de base × 0,92  
+Prix haut = prix de base × 1,08  
+ 
+Valeurs de référence indicatives pour le G rand Nancy (à affiner par MERINO) :  
+ 
+Type de bien  Prix au m² de référence  
+Appartement  2 200 €/m²  
+Maison  2 600 €/m²  
+Terrain  120 €/m²  
+Local commercial  1 800 €/m²  
+ 
+Ces valeurs sont des paramètres modifiables facilement dans le code (objet de configuration). 
+MERINO pourra les ajuster sans intervention du développeur si le code est correctement 
+structuré.  
+ 
+8. Réception des leads  
+ 
+Les données du formulaire sont envoyées par email à l'adresse de MERINO (à confirmer). 
+L'email contient : prénom, téléphone, type de bien, adresse, surface, agent associé, et 
+date/heure de la soumission.  
+ 
+Solution recommandée : formulaire géré via un servi ce d'envoi d'email tiers (Formspree, EmailJS, 
+ou endpoint serveur simple). Aucune base de données n'est requise à ce stade.  
+ 
+9. Tracking  
+ 
+Intégrer le Meta Pixel sur les trois pages.  
+– Événement PageView : sur toutes les pages  
+– Événement Lead : au chargement d e la Page 3 uniquement  
+ 
+L'ID du Pixel Meta sera fourni par MERINO avant la mise en production.  
+ 
+10. Spécifications techniques  
+ 
+10.1 Performance mobile  
+70% du trafic Meta arrive sur mobile. Les performances mobiles sont non négociables.  
+– Temps de chargement < 3 secondes sur 4G (score Google PageSpeed > 80)  
+– Design mobile -first 
+– Images compressées en WebP  
+– Formulaire visible sans scroller sur mobile  
+ 
+10.2 Stack technique  
+– Pages statiques ou framework léger (Next.js, Nuxt, HTML/CSS/JS vanilla)  
+– Pas de WordPress  
+– HTTP S obligatoire (requis par Meta Ads)  
+– Hébergement et nom de domaine gérés par le développeur  
+ 
+10.3 Compatibilité navigateurs  
+– Chrome, Firefox, Safari — desktop et mobile  
+– iOS Safari 14+ et Android Chrome  
+ 
+10.4 URLs et structure  
+– Landing page : domaine principal ou sous -domaine dédié (ex : vendre.merino -immo.fr)  
+– Page de chargement : /chargement  
+– Page de confirmation : /confirmation  
+– Les trois pages sont isolées — aucun lien vers le site vitrine, pas de menu  
+ 
+11. Mentions légales et R GPD  
+ 
+– Lien vers la politique de confidentialité en footer (page à créer ou popup)  
+– Mention RGPD sous le formulaire : "Vos données ne seront jamais transmises à des tiers."  
+– Conformité RGPD pour la collecte de données personnelles (prénom, téléphone)  
+ 
+12. Livr ables attendus  
+ 
+Livrable  Description  Statut  
+Page 1 — Landing  Page complète, formulaire fonctionnel  À livrer  
+Page 2 — Chargement  Animation + fiche agent dynamique  À livrer  
+Page 3 — Confirmation  Résultat + contact + guide  À livrer  
+Moteur d'estimation  Calcul JS côté client  À livrer  
+Routing agent  Paramètre URL ?agent=  À livrer  
+Envoi email leads  Formulaire → email MERINO  À livrer  
+Meta Pixel  PageView + Lead  À livrer (ID fourni 
+par MERINO)  
+Guide PDF  Bouton téléchargement  PDF fourni par 
+MERINO  
+Vidéos agents  Placeholders → vidéos réelles  Vidéos fournies 
+par MERINO  
+Mentions légales  Page ou popup  À livrer  
+ 
+ 
+Document MERINO — Confidentiel — Ne pas diffuser  

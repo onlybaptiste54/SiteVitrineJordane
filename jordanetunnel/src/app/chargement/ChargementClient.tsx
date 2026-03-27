@@ -16,7 +16,7 @@ const AGENT_DATA = {
     prenom: "Louis",
     nomComplet: "Louis PETITCOLIN",
     telephone: "07 59 59 92 97",
-    photo: "/LogoMerino.png",
+    photo: "/photoLouis.jpg",
     titre: "Co-fondateur MERINO",
   },
 };
@@ -28,7 +28,6 @@ export default function ChargementClient() {
   const agent = AGENT_DATA[agentKey] || AGENT_DATA["jordane"];
   const prenom = searchParams.get("prenom") || "";
 
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState("Analyse du secteur immobilier...");
 
@@ -46,18 +45,21 @@ export default function ChargementClient() {
     else setStatusText(statusMessages[3]);
   }, [progress]);
 
-  const handleTimeUpdate = () => {
-    if (videoRef.current && videoRef.current.duration) {
-      const current = videoRef.current.currentTime;
-      const duration = videoRef.current.duration;
-      const percentage = (current / duration) * 100;
-      setProgress(percentage);
-    }
-  };
-
-  const handleVideoEnd = () => {
-    router.push(`/confirmation?${searchParams.toString()}`);
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            router.push("/confirmation");
+          }, 500);
+          return 100;
+        }
+        return prev + Math.random() * 25;
+      });
+    }, 800);
+    return () => clearInterval(interval);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-merino-blue flex items-center justify-center p-4 selection:bg-merino-orange/30">
@@ -90,18 +92,12 @@ export default function ChargementClient() {
           </div>
         </div>
 
-        {/* Espace Vidéo Vertical : Grand, sans bordures agressives */}
-        <div className="w-56 mx-auto aspect-[9/16] bg-black/5 rounded-2xl overflow-hidden relative shadow-md">
-          <video 
-            ref={videoRef}
-            autoPlay 
-            playsInline 
-            muted 
-            className="w-full h-full object-cover"
-            onTimeUpdate={handleTimeUpdate}
-            onEnded={handleVideoEnd}
-            src="https://www.w3schools.com/html/mov_bbb.mp4" 
-          />
+        {/* Espace Illustration - Vide et épuré */}
+        <div className="w-56 mx-auto aspect-[9/16] bg-gradient-to-br from-merino-blue/10 to-merino-orange/5 rounded-2xl overflow-hidden relative shadow-md flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-5xl mb-3">📊</div>
+            <p className="text-merino-blue/60 text-xs font-medium">Analyse en cours...</p>
+          </div>
           {/* Léger filtre intérieur pour le luxe */}
           <div className="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-2xl pointer-events-none"></div>
         </div>

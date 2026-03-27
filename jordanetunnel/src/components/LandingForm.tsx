@@ -11,7 +11,7 @@ import { Loader2, ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 export default function LandingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const agentUrl = searchParams.get("agent") || "jordane";
+  const agentUrl = searchParams.get("agent") || "louis";
   
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,7 +87,7 @@ export default function LandingForm() {
     try {
       const formData = new window.FormData();
       Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
+        if (value !== undefined && value !== null && !(typeof value === 'number' && isNaN(value))) {
           formData.append(key, value.toString());
         }
       });
@@ -100,16 +100,10 @@ export default function LandingForm() {
         return;
       }
 
-      const params = new URLSearchParams();
-      Object.entries(result.data || {}).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && typeof value !== 'boolean') {
-          params.set(key, value.toString());
-        }
-      });
-      // Handle fallback agent
-      if (!params.has("agent")) params.set("agent", agentUrl);
-      
-      router.push(`/chargement?${params.toString()}`);
+      // Données passées en cookie côté serveur — on passe juste prenom/agent pour l'écran de chargement
+      const prenom = result.prenom ?? "";
+      const agent = result.agent ?? agentUrl;
+      router.push(`/chargement?prenom=${encodeURIComponent(prenom)}&agent=${encodeURIComponent(agent)}`);
     } catch (e) {
       setServerError("Une erreur inattendue est survenue.");
       setIsSubmitting(false);
@@ -122,12 +116,12 @@ export default function LandingForm() {
         <div key={s} className="flex items-center">
           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-colors ${
             step === s ? "bg-merino-orange text-white ring-4 ring-orange-100" : 
-            step > s ? "bg-green-500 text-white" : "bg-gray-100 text-gray-400"
+            step > s ? "bg-merino-blue text-white" : "bg-gray-100 text-gray-400"
           }`}>
             {step > s ? "✓" : s}
           </div>
           {s < 4 && (
-            <div className={`h-1 w-8 sm:w-16 md:w-20 mx-2 rounded-full ${step > s ? "bg-green-500" : "bg-gray-100"}`}></div>
+            <div className={`h-1 w-8 sm:w-16 md:w-20 mx-2 rounded-full ${step > s ? "bg-merino-blue" : "bg-gray-100"}`}></div>
           )}
         </div>
       ))}
@@ -239,15 +233,15 @@ export default function LandingForm() {
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block text-xs font-semibold mb-1 text-gray-700">Jardin (m²)</label>
-            <input type="number" placeholder="Ex: 100" {...register("surfaceJardin", { valueAsNumber: true })} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-merino-blue text-sm" />
+            <input type="number" placeholder="Ex: 100" {...register("surfaceJardin", { setValueAs: v => v === "" ? undefined : Number(v) })} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-merino-blue text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1 text-gray-700">Terrasse (m²)</label>
-            <input type="number" placeholder="Ex: 20" {...register("surfaceTerrasse", { valueAsNumber: true })} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-merino-blue text-sm" />
+            <input type="number" placeholder="Ex: 20" {...register("surfaceTerrasse", { setValueAs: v => v === "" ? undefined : Number(v) })} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-merino-blue text-sm" />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1 text-gray-700">Balcon (m²)</label>
-            <input type="number" placeholder="Ex: 5" {...register("surfaceBalcon", { valueAsNumber: true })} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-merino-blue text-sm" />
+            <input type="number" placeholder="Ex: 5" {...register("surfaceBalcon", { setValueAs: v => v === "" ? undefined : Number(v) })} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-merino-blue text-sm" />
           </div>
         </div>
 
@@ -280,7 +274,7 @@ export default function LandingForm() {
       <div className={step === 3 ? "block space-y-6 animate-in fade-in slide-in-from-right-4 duration-300" : "hidden"}>
         <div>
           <label className="block text-sm font-semibold mb-1 text-gray-700">Année de construction (Optionnel)</label>
-          <input type="number" placeholder="Ex: 1990" {...register("anneeConstruction", { valueAsNumber: true })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-merino-blue outline-none text-sm" />
+          <input type="number" placeholder="Ex: 1990" {...register("anneeConstruction", { setValueAs: v => v === "" ? undefined : Number(v) })} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-merino-blue outline-none text-sm" />
         </div>
 
         <div className="pt-2">
