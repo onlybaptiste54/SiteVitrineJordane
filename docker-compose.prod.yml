@@ -19,6 +19,12 @@ services:
       - "traefik.http.middlewares.merinoVente-www.redirectregex.permanent=true"
       - "traefik.http.routers.merinoVente.middlewares=merinoVente-www@docker"
       - "traefik.http.services.merinoVente.loadbalancer.server.port=3000"
+      # Redirect HTTP → HTTPS
+      - "traefik.http.routers.merinoVente-http.rule=Host(`vendreavecmerino.com`) || Host(`www.vendreavecmerino.com`)"
+      - "traefik.http.routers.merinoVente-http.entrypoints=web"
+      - "traefik.http.middlewares.merinoVente-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.merinoVente-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.merinoVente-http.middlewares=merinoVente-https@docker"
       - "traefik.docker.network=n8n-stack_default"
 
 networks:
