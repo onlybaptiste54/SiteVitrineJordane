@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Lock, PhoneCall, ShieldCheck } from "lucide-react";
+import { Download, Lock, PhoneCall, ShieldCheck } from "lucide-react";
 
 export type EstimationData = {
   prenom: string;
@@ -152,9 +152,14 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
             <h3 className="font-extrabold text-xl text-merino-blue">Methode / Guide</h3>
             <p className="text-gray-500 mt-1 font-medium">Telechargez des maintenant notre guide pour vendre vite et au bon prix.</p>
           </div>
-          <button className="w-full md:w-auto bg-merino-blue text-white px-8 py-4 rounded-xl font-bold hover:bg-merino-blue-dark transition-colors shrink-0 shadow-md">
-            Recevoir mon estimation complete
-          </button>
+          <a
+            href="/guide_merino.pdf"
+            download="Guide_Estimation_MERINO.pdf"
+            className="w-full md:w-auto bg-merino-blue text-white px-8 py-4 rounded-xl font-bold hover:bg-merino-blue-dark transition-colors shrink-0 shadow-md flex items-center justify-center gap-2"
+          >
+            <Download size={18} />
+            Telecharger le guide
+          </a>
         </div>
 
         <div className="mt-12 text-center text-sm text-gray-400/80 max-w-lg mx-auto pb-4">
