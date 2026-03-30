@@ -46,6 +46,10 @@ export default function ChargementClient() {
   }, [progress]);
 
   useEffect(() => {
+    // 20 secondes = 20000ms. On avance de 1% toutes les 200ms
+    const intervalMs = 200;
+    const increment = 100 / (20000 / intervalMs);
+
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
@@ -55,9 +59,10 @@ export default function ChargementClient() {
           }, 500);
           return 100;
         }
-        return prev + Math.random() * 25;
+        return prev + increment;
       });
-    }, 800);
+    }, intervalMs);
+    
     return () => clearInterval(interval);
   }, [router]);
 
@@ -92,14 +97,18 @@ export default function ChargementClient() {
           </div>
         </div>
 
-        {/* Espace Illustration - Vide et épuré */}
-        <div className="w-56 mx-auto aspect-[9/16] bg-gradient-to-br from-merino-blue/10 to-merino-orange/5 rounded-2xl overflow-hidden relative shadow-md flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-5xl mb-3">📊</div>
-            <p className="text-merino-blue/60 text-xs font-medium">Analyse en cours...</p>
-          </div>
-          {/* Léger filtre intérieur pour le luxe */}
-          <div className="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-2xl pointer-events-none"></div>
+        {/* Espace Vidéo - Format Vertical */}
+        <div className="w-64 max-w-full mx-auto aspect-[9/16] bg-black rounded-2xl overflow-hidden relative shadow-md flex items-center justify-center">
+          {/* Vidéo de Louis qui va se lancer */}
+          <video 
+            src="/video-louis.mp4" 
+            autoPlay 
+            muted 
+            playsInline 
+            className="w-full h-full object-cover"
+          ></video>
+          
+          <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-2xl pointer-events-none"></div>
         </div>
 
         {/* Pied : Mention Agent très fine */}

@@ -60,9 +60,11 @@ export default function Home() {
 
           {/* FORMULAIRE */}
           <div id="formulaire" className="bg-white rounded-2xl shadow-2xl p-6 text-merino-black relative w-full lg:max-w-xl xl:max-w-2xl mx-auto lg:mx-0 z-10 border border-white/40">
-            <div className="text-center mb-5">
-              <h2 className="text-xl font-bold text-merino-blue">Connaître le prix de mon bien</h2>
-              <p className="text-gray-500 text-xs mt-1">Estimation gratuite · Résultat immédiat</p>
+            <div className="text-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-merino-blue uppercase tracking-tight">
+                Connaître la <span className="text-merino-orange">valeur</span> de mon bien
+              </h2>
+              <p className="text-gray-500 font-medium text-sm md:text-base mt-2">Estimation gratuite · Résultat immédiat</p>
             </div>
             <Suspense fallback={<div className="text-center py-6 opacity-50">Chargement du formulaire...</div>}>
               <LandingForm />
