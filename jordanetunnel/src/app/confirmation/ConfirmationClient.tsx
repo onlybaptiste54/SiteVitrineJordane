@@ -37,7 +37,7 @@ const formatPrice = (price: number) =>
 export default function ConfirmationClient({ data }: { data: EstimationData }) {
   const agentKey = (data.agent as keyof typeof AGENT_DATA) in AGENT_DATA
     ? (data.agent as keyof typeof AGENT_DATA)
-    : "jordane";
+    : "louis";
   const agent = AGENT_DATA[agentKey];
   const { prenom, type, prixBas, prixHaut, commentaire, source } = data;
 
@@ -70,9 +70,9 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
               <div className="mt-8 mb-10">
                 <p className="text-gray-500 text-sm mb-2 font-medium">Prix estime pour votre {type}</p>
                 {prixBas ? (
-                  <div className="flex items-baseline flex-wrap gap-x-3 gap-y-1">
-                    <span className="text-5xl md:text-6xl font-extrabold text-merino-blue tracking-tight">{formatPrice(prixBas)}</span>
-                    <span className="text-2xl md:text-3xl text-gray-400 font-medium">a {formatPrice(prixHaut)}</span>
+                  <div className="flex items-baseline gap-x-2 md:gap-x-3 whitespace-nowrap">
+                    <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-merino-blue tracking-tight">{formatPrice(prixBas)}</span>
+                    <span className="text-xl sm:text-2xl md:text-3xl text-gray-400 font-medium">à {formatPrice(prixHaut)}</span>
                   </div>
                 ) : (
                   <div className="text-4xl md:text-5xl font-extrabold text-merino-black tracking-tight">Calcul impossible</div>
@@ -90,7 +90,7 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
                 <div className="h-3 w-full rounded-full bg-gradient-to-r from-red-400 via-orange-300 to-green-400 relative shadow-inner">
                   <div
                     className="absolute w-6 h-6 bg-white border-4 border-merino-blue rounded-full shadow-lg top-1/2 -translate-y-1/2 -translate-x-1/2 transition-transform hover:scale-110"
-                    style={{ left: "20%" }}
+                    style={{ left: "65%" }}
                   ></div>
                 </div>
               </div>

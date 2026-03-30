@@ -24,8 +24,8 @@ const AGENT_DATA = {
 export default function ChargementClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const agentKey = (searchParams.get("agent") as keyof typeof AGENT_DATA) || "jordane";
-  const agent = AGENT_DATA[agentKey] || AGENT_DATA["jordane"];
+  const agentKey = (searchParams.get("agent") as keyof typeof AGENT_DATA) || "louis";
+  const agent = AGENT_DATA[agentKey] || AGENT_DATA["louis"];
   const prenom = searchParams.get("prenom") || "";
 
   const [progress, setProgress] = useState(0);
