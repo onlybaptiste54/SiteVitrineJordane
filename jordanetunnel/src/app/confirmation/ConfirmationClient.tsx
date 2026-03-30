@@ -49,12 +49,12 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
             <ShieldCheck size={32} />
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
-            {prenom ? `${prenom}, voici votre estimation.` : "Voici votre estimation."}
+            {prenom ? <><span className="text-merino-orange">{prenom}</span>, voici votre estimation.</> : "Voici votre estimation."}
           </h1>
           <p className="mt-4 text-white/80 text-lg max-w-xl mx-auto">
             {source === "claude"
-              ? "Cette fourchette est calculee par intelligence artificielle sur la base des donnees du marche local."
-              : "Cette fourchette indicative est calculee sur la base de criteres objectifs de marche."}
+              ? "Cette fourchette est calculée par intelligence artificielle sur la base des donnees du marché local."
+              : "Cette fourchette indicative est calculee sur la base de criteres objectifs de marché."}
           </p>
         </div>
 
@@ -64,15 +64,15 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
 
             <div className="relative z-10">
               <span className="uppercase tracking-wider text-xs font-bold text-merino-orange bg-merino-orange/10 px-3 py-1 rounded-full">
-                Fourchette de marche
+                Fourchette de marché
               </span>
 
               <div className="mt-8 mb-10">
-                <p className="text-gray-500 text-sm mb-2 font-medium">Prix estime pour votre {type}</p>
+                <p className="text-gray-500 text-sm mb-2 font-medium">Prix estimé pour votre {type}</p>
                 {prixBas ? (
-                  <div className="flex items-baseline gap-x-2 md:gap-x-3 whitespace-nowrap">
-                    <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-merino-blue tracking-tight">{formatPrice(prixBas)}</span>
-                    <span className="text-xl sm:text-2xl md:text-3xl text-gray-400 font-medium">à {formatPrice(prixHaut)}</span>
+                  <div>
+                    <p className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-merino-blue tracking-tight">{formatPrice(prixBas)}</p>
+                    <p className="text-xl sm:text-2xl md:text-3xl text-gray-400 font-medium mt-1">à {formatPrice(prixHaut)}</p>
                   </div>
                 ) : (
                   <div className="text-4xl md:text-5xl font-extrabold text-merino-black tracking-tight">Calcul impossible</div>
@@ -81,7 +81,7 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
 
               <div className="mb-2">
                 <p className="text-gray-400 font-medium text-xs uppercase tracking-widest text-center mb-4">
-                  Fiabilite de l&apos;estimation
+                  Fiabilité de l&apos;estimation
                 </p>
                 <div className="flex justify-between text-sm font-semibold text-gray-400 mb-3 px-1">
                   <span className="text-red-400">Basse</span>
@@ -90,7 +90,7 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
                 <div className="h-3 w-full rounded-full bg-gradient-to-r from-red-400 via-orange-300 to-green-400 relative shadow-inner">
                   <div
                     className="absolute w-6 h-6 bg-white border-4 border-merino-blue rounded-full shadow-lg top-1/2 -translate-y-1/2 -translate-x-1/2 transition-transform hover:scale-110"
-                    style={{ left: "65%" }}
+                    style={{ left: "40%" }}
                   ></div>
                 </div>
               </div>
@@ -105,8 +105,7 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
             <div className="mt-10 pt-6 border-t border-gray-100 relative z-10">
               <p className="text-sm text-gray-600 leading-relaxed font-medium">
                 <span className="text-merino-orange font-bold mr-1">Note :</span>
-                Cette valeur est purement algorithmique. Seul un oeil expert de notre agence dans le Grand Nancy
-                permet d&apos;affiner precisement en valorisant les atouts uniques de votre bien.
+                Cette valeur est purement algorithmique. Seul un rendez-vous avec un agent MERINO permet d&apos;estimer précisément la valeur de votre bien.
               </p>
             </div>
           </div>

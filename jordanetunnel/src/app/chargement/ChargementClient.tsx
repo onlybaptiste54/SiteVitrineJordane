@@ -75,7 +75,7 @@ export default function ChargementClient() {
         {/* Titre et Barre en haut */}
         <div className="mb-8">
           <h2 className="text-[22px] leading-snug font-medium text-merino-blue mb-5">
-            <span className="font-bold">{prenom ? `${prenom}, r` : "R"}etour automatique</span><br/>de votre estimation en cours...
+            <span className="font-bold">{prenom ? <><span className="text-merino-orange">{prenom}</span>, r</> : "R"}etour automatique</span><br/>de votre estimation en cours...
           </h2>
 
           <div className="space-y-2">

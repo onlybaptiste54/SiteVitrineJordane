@@ -40,11 +40,13 @@ export default function Home() {
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-extrabold leading-tight">
-              Vendez <span className="text-merino-orange">vite</span> et au <span className="text-merino-orange">bon prix</span> avec notre méthode.
+              Vendez <span className="text-merino-orange">vite</span> et au <span className="text-merino-orange">bon prix</span> avec notre méthode <span className="text-merino-orange">à Nancy.</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-white/90">
-              Une estimation gratuite en 2 minutes. On vous rappelle sous 24h.
+              Une estimation gratuite en 2 minutes. 
+              <br />
+              On vous rappelle sous 24h.
             </p>
 
             <div className="mt-8 p-4 bg-white/5 border border-white/10 rounded-xl backdrop-blur-sm">
@@ -86,7 +88,7 @@ export default function Home() {
       <section className="py-24 px-4 bg-merino-gray-light">
         <div className="container mx-auto">
           <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-bold text-merino-blue mb-4">La Méthode MERINO</h2>
+            <h2 className="text-3xl md:text-5xl font-bold text-merino-blue mb-4">La méthode MERINO</h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg">Une approche experte et ciblée pour une transaction réussie.</p>
           </div>
           
