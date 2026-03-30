@@ -99,11 +99,10 @@ export default function ChargementClient() {
 
         {/* Espace Vidéo - Format Vertical */}
         <div className="w-64 max-w-full mx-auto aspect-[9/16] bg-black rounded-2xl overflow-hidden relative shadow-md flex items-center justify-center">
-          {/* Vidéo de Louis qui va se lancer */}
+          {/* Vidéo de Louis qui va se lancer avec le son */}
           <video 
             src="/video-louis.mp4" 
             autoPlay 
-            muted 
             playsInline 
             className="w-full h-full object-cover"
           ></video>

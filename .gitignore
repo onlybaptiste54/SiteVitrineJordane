@@ -4,12 +4,6 @@
 /dist/
 /coverage/
 
-# Root-only local package files
-/package.json
-/package-lock.json
-/yarn.lock
-/pnpm-lock.yaml
-
 # Environment files
 /.env
 /.env.*

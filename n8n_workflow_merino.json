@@ -1,5 +1,4 @@
 {
-  "name": "MERINO - Lead & Estimation Claude",
   "nodes": [
     {
       "parameters": {
@@ -8,173 +7,209 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "aa000001-0001-0001-0001-000000000001",
+      "id": "b3b970d5-ed10-45ef-8d08-e33d516a9a79",
       "name": "Webhook MERINO",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [-400, 300],
+      "position": [
+        -1184,
+        176
+      ],
       "webhookId": "merino-lead-webhook"
     },
     {
       "parameters": {
         "conditions": {
-          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
           "conditions": [
             {
               "id": "aa000001-cond-0001",
               "leftValue": "={{ $json.headers['x-webhook-secret'] }}",
-              "rightValue": "REMPLACER_PAR_VOTRE_SECRET",
-              "operator": { "type": "string", "operation": "equals" }
+              "rightValue": "w6P3Hyntdupo2zlcJ7uLvyuKey2tTwUafjpBThQL",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
         },
         "options": {}
       },
-      "id": "aa000001-0002-0002-0002-000000000002",
+      "id": "62a960bd-7987-4e4c-9ce7-0875635582fa",
       "name": "Vérifier Secret",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [-160, 300]
+      "position": [
+        -976,
+        192
+      ]
     },
     {
       "parameters": {
         "respondWith": "json",
         "responseBody": "={ \"error\": \"Unauthorized\" }",
-        "options": { "responseCode": 401 }
+        "options": {
+          "responseCode": 401
+        }
       },
-      "id": "aa000001-0003-0003-0003-000000000003",
+      "id": "e6b5a144-7a57-490f-97ed-99f7abd95ecf",
       "name": "Refuser 401",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [-160, 500]
+      "position": [
+        -848,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Rate limiter : max 3 estimations par email par heure\nconst WINDOW = 60 * 60 * 1000;\nconst MAX_REQUESTS = 3;\nconst email = $('Webhook MERINO').first().json.body.email;\nconst ip = $('Webhook MERINO').first().json.headers['x-real-ip'] ?? $('Webhook MERINO').first().json.headers['x-forwarded-for'] ?? 'unknown';\nconst now = Date.now();\n\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.rateLimits) staticData.rateLimits = {};\n\n// Clé combinée email + IP\nconst key = `${email}__${ip}`;\n\n// Nettoyer les entrées expirées\nfor (const k of Object.keys(staticData.rateLimits)) {\n  staticData.rateLimits[k] = staticData.rateLimits[k].filter(t => now - t < WINDOW);\n  if (staticData.rateLimits[k].length === 0) delete staticData.rateLimits[k];\n}\n\nconst hits = staticData.rateLimits[key] ?? [];\nconst blocked = hits.length >= MAX_REQUESTS;\n\nif (!blocked) {\n  hits.push(now);\n  staticData.rateLimits[key] = hits;\n}\n\nreturn [{ json: { blocked, remaining: MAX_REQUESTS - hits.length, ...$input.first().json } }];"
+      },
+      "id": "a1b2c3d4-rate-limit-node-0001",
+      "name": "Rate Limiter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -860,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "aa000002-cond-0001",
+              "leftValue": "={{ $json.blocked }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d5-rate-check-node-0001",
+      "name": "Rate Limit Dépassé ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -752,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"Trop de requêtes. Réessayez dans 1 heure.\", \"retryAfter\": 3600 }",
+        "options": {
+          "responseCode": 429
+        }
+      },
+      "id": "a1b2c3d6-rate-429-node-0001",
+      "name": "Refuser 429",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        420
+      ]
     },
     {
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "claude-haiku-4-5-20251001",
+          "value": "claude-sonnet-4-6",
           "mode": "list",
-          "cachedResultName": "claude-haiku-4-5-20251001"
+          "cachedResultName": "claude-sonnet-4-6"
         },
         "messages": {
           "values": [
             {
-              "role": "system",
-              "content": "Tu es un expert en estimation immobilière sur le Grand Nancy (Meurthe-et-Moselle, France). Tu connais les prix du marché local 2024-2025. Réponds UNIQUEMENT avec un JSON valide sur une seule ligne, sans markdown, sans explication : {\"prixBas\": number, \"prixHaut\": number, \"commentaire\": string}. Le commentaire : une phrase courte (max 20 mots) pertinente sur le bien ou le marché."
-            },
-            {
-              "role": "user",
-              "content": "={{ 'Bien à estimer : Type=' + $('Webhook MERINO').first().json.body.type + ', Surface=' + $('Webhook MERINO').first().json.body.surface + 'm², Adresse=' + $('Webhook MERINO').first().json.body.adresse + ', Chambres=' + ($('Webhook MERINO').first().json.body.chambres ?? 'non renseigné') + ', État intérieur=' + $('Webhook MERINO').first().json.body.etatInterieur + '/5, État parties communes=' + ($('Webhook MERINO').first().json.body.etatCommuns ?? 'N/A') + '/5, Année construction=' + ($('Webhook MERINO').first().json.body.anneeConstruction ?? 'non renseignée') + ', Balcon=' + ($('Webhook MERINO').first().json.body.surfaceBalcon ?? 0) + 'm², Terrasse=' + ($('Webhook MERINO').first().json.body.surfaceTerrasse ?? 0) + 'm², Jardin=' + ($('Webhook MERINO').first().json.body.surfaceJardin ?? 0) + 'm², Parking intérieur=' + ($('Webhook MERINO').first().json.body.statInterieur ?? 0) + ', Parking extérieur=' + ($('Webhook MERINO').first().json.body.statExterieur ?? 0) + '.' }}"
+              "content": "Tu es un expert en estimation immobilière sur le Grand Nancy (Meurthe-et-Moselle, France). Tu connais les prix du marché local 2024-2025. Réponds UNIQUEMENT avec un JSON valide sur une seule ligne, sans markdown, sans explication. Format exact obligatoire : {\"prixBas\":NUMBER,\"prixHaut\":NUMBER,\"commentaire\":\"STRING\"}"
             }
           ]
         },
         "options": {
+          "system": "={{ 'Bien à estimer : Type=' + $('Webhook MERINO').first().json.body.type + ', Surface=' + $('Webhook MERINO').first().json.body.surface + 'm², Adresse=' + $('Webhook MERINO').first().json.body.adresse + ', Chambres=' + ($('Webhook MERINO').first().json.body.chambres ?? 'non renseigné') + ', État intérieur=' + $('Webhook MERINO').first().json.body.etatInterieur + '/5, État parties communes=' + ($('Webhook MERINO').first().json.body.etatCommuns ?? 'N/A') + '/5, Année construction=' + ($('Webhook MERINO').first().json.body.anneeConstruction ?? 'non renseignée') + ', Balcon=' + ($('Webhook MERINO').first().json.body.surfaceBalcon ?? 0) + 'm², Terrasse=' + ($('Webhook MERINO').first().json.body.surfaceTerrasse ?? 0) + 'm², Jardin=' + ($('Webhook MERINO').first().json.body.surfaceJardin ?? 0) + 'm², Parking intérieur=' + ($('Webhook MERINO').first().json.body.statInterieur ?? 0) + ', Parking extérieur=' + ($('Webhook MERINO').first().json.body.statExterieur ?? 0) + '.' }}",
           "maxTokens": 400
         }
       },
-      "id": "aa000001-0004-0004-0004-000000000004",
+      "id": "89367b53-0a44-433e-b4cc-c47a54b8060a",
       "name": "Claude Haiku - Estimation",
       "type": "@n8n/n8n-nodes-langchain.anthropic",
       "typeVersion": 1,
-      "position": [80, 300],
+      "position": [
+        -752,
+        176
+      ],
       "credentials": {
         "anthropicApi": {
-          "id": "SvRUQt6O0bdDgD2d",
-          "name": "Anthropic account"
+          "id": "cd3snYiuBfEcQhlm",
+          "name": "jordane"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "// Parser la réponse de Claude + récupérer les données du lead\nconst claudeRaw = $input.first().json.text;\nconst lead = $('Webhook MERINO').first().json.body;\n\nlet estimation;\ntry {\n  const clean = claudeRaw.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  estimation = JSON.parse(clean);\n} catch (e) {\n  estimation = { prixBas: 0, prixHaut: 0, commentaire: 'Estimation à affiner avec nos experts.' };\n}\n\nconst formatPrice = (p) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(p);\n\nreturn [{\n  json: {\n    // Estimation Claude\n    prixBas: estimation.prixBas,\n    prixHaut: estimation.prixHaut,\n    prixBasFmt: formatPrice(estimation.prixBas),\n    prixHautFmt: formatPrice(estimation.prixHaut),\n    commentaire: estimation.commentaire,\n    // Lead\n    prenom: lead.prenom,\n    nom: lead.nom,\n    email: lead.email,\n    telephone: lead.telephone,\n    type: lead.type,\n    adresse: lead.adresse,\n    surface: lead.surface,\n    chambres: lead.chambres,\n    anneeConstruction: lead.anneeConstruction,\n    etatInterieur: lead.etatInterieur,\n    etatCommuns: lead.etatCommuns,\n    surfaceBalcon: lead.surfaceBalcon ?? 0,\n    surfaceTerrasse: lead.surfaceTerrasse ?? 0,\n    surfaceJardin: lead.surfaceJardin ?? 0,\n    statInterieur: lead.statInterieur ?? 0,\n    statExterieur: lead.statExterieur ?? 0,\n    agent: lead.agent ?? 'jordane',\n    agentNom: (lead.agent === 'louis') ? 'Louis PETITCOLIN' : 'Jordane MOREL',\n    agentEmail: (lead.agent === 'louis') ? 'louis@agencemerino.com' : 'jordane@agencemerino.com',\n    agentTel: (lead.agent === 'louis') ? '+33 7 59 59 92 97' : '+33 6 95 06 73 20',\n    soumisLe: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })\n  }\n}];"
+        "jsCode": "// Parser la réponse de Claude + récupérer les données du lead\nconst raw = $input.first().json;\nconst claudeRaw = raw.text ?? raw.content?.[0]?.text ?? JSON.stringify(raw);\nconst lead = $('Webhook MERINO').first().json.body;\n\nlet estimation;\ntry {\n  const clean = claudeRaw.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  estimation = JSON.parse(clean);\n} catch (e) {\n  estimation = { prixBas: 0, prixHaut: 0, commentaire: 'Estimation à affiner avec nos experts.' };\n}\n\nconst formatPrice = (p) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(p);\n\nreturn [{\n  json: {\n    // Estimation Claude\n    prixBas: estimation.prixBas,\n    prixHaut: estimation.prixHaut,\n    prixBasFmt: formatPrice(estimation.prixBas),\n    prixHautFmt: formatPrice(estimation.prixHaut),\n    commentaire: estimation.commentaire,\n    // Lead\n    prenom: lead.prenom,\n    nom: lead.nom,\n    email: lead.email,\n    telephone: lead.telephone,\n    type: lead.type,\n    adresse: lead.adresse,\n    surface: lead.surface,\n    chambres: lead.chambres,\n    anneeConstruction: lead.anneeConstruction,\n    etatInterieur: lead.etatInterieur,\n    etatCommuns: lead.etatCommuns,\n    surfaceBalcon: lead.surfaceBalcon ?? 0,\n    surfaceTerrasse: lead.surfaceTerrasse ?? 0,\n    surfaceJardin: lead.surfaceJardin ?? 0,\n    statInterieur: lead.statInterieur ?? 0,\n    statExterieur: lead.statExterieur ?? 0,\n    agent: lead.agent ?? 'jordane',\n    agentNom: (lead.agent === 'louis') ? 'Louis PETITCOLIN' : 'Jordane MOREL',\n    agentEmail: (lead.agent === 'louis') ? 'louis@agencemerino.com' : 'jordane@agencemerino.com',\n    agentTel: (lead.agent === 'louis') ? '+33 7 59 59 92 97' : '+33 6 95 06 73 20',\n    soumisLe: new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })\n  }\n}];"
       },
-      "id": "aa000001-0005-0005-0005-000000000005",
+      "id": "8ef1cafa-9119-4269-a114-39fc5b1ec215",
       "name": "Parser Réponse Claude",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [340, 300]
-    },
-    {
-      "parameters": {
-        "operation": "append",
-        "documentId": {
-          "__rl": true,
-          "value": "REMPLACER_PAR_ID_GOOGLE_SHEET",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "Leads",
-          "mode": "name"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Date": "={{ $json.soumisLe }}",
-            "Prénom": "={{ $json.prenom }}",
-            "Nom": "={{ $json.nom }}",
-            "Email": "={{ $json.email }}",
-            "Téléphone": "={{ $json.telephone }}",
-            "Type": "={{ $json.type }}",
-            "Adresse": "={{ $json.adresse }}",
-            "Surface": "={{ $json.surface }}",
-            "Chambres": "={{ $json.chambres ?? '' }}",
-            "Année construction": "={{ $json.anneeConstruction ?? '' }}",
-            "État intérieur": "={{ $json.etatInterieur }}",
-            "État communs": "={{ $json.etatCommuns ?? '' }}",
-            "Balcon m²": "={{ $json.surfaceBalcon }}",
-            "Terrasse m²": "={{ $json.surfaceTerrasse }}",
-            "Jardin m²": "={{ $json.surfaceJardin }}",
-            "Parking int.": "={{ $json.statInterieur }}",
-            "Parking ext.": "={{ $json.statExterieur }}",
-            "Agent": "={{ $json.agent }}",
-            "Prix bas": "={{ $json.prixBas }}",
-            "Prix haut": "={{ $json.prixHaut }}",
-            "Commentaire IA": "={{ $json.commentaire }}",
-            "Source": "claude"
-          }
-        },
-        "options": {
-          "valueInputMode": "USER_ENTERED"
-        }
-      },
-      "id": "aa000001-0006-0006-0006-000000000006",
-      "name": "Google Sheets - Stocker Lead",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.4,
-      "position": [600, 180],
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "K4fNPe9eHdsVJfnX",
-          "name": "GOOGle compte entreprise"
-        }
-      }
+      "position": [
+        -432,
+        176
+      ]
     },
     {
       "parameters": {
         "jsCode": "// Génère le contenu HTML des deux emails (agent + client)\nconst d = $input.first().json;\n\n// ── EMAIL AGENT (notification interne) ──────────────────────────────\nconst subjectAgent = `🏠 Nouveau lead – ${d.prenom} ${d.nom} – ${d.type} ${d.surface}m²`;\nconst htmlAgent = `\n<!DOCTYPE html><html><body style=\"margin:0;font-family:Arial,sans-serif;background:#f3f4f6\">\n<div style=\"max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;\">\n  <div style=\"background:#1a3a5c;padding:24px\">\n    <h1 style=\"color:white;margin:0;font-size:20px\">🏠 Nouveau lead MERINO</h1>\n    <p style=\"color:rgba(255,255,255,.7);margin:6px 0 0;font-size:13px\">${d.soumisLe}</p>\n  </div>\n  <div style=\"padding:24px\">\n    <h2 style=\"color:#1a3a5c;font-size:15px;border-bottom:2px solid #f97316;padding-bottom:6px\">Contact</h2>\n    <p style=\"margin:6px 0\"><strong>Nom :</strong> ${d.prenom} ${d.nom}</p>\n    <p style=\"margin:6px 0\"><strong>Email :</strong> <a href=\"mailto:${d.email}\">${d.email}</a></p>\n    <p style=\"margin:6px 0\"><strong>Tél :</strong> <a href=\"tel:${d.telephone}\">${d.telephone}</a></p>\n    <h2 style=\"color:#1a3a5c;font-size:15px;border-bottom:2px solid #f97316;padding-bottom:6px;margin-top:20px\">Bien</h2>\n    <p style=\"margin:6px 0\"><strong>Type :</strong> ${d.type}</p>\n    <p style=\"margin:6px 0\"><strong>Adresse :</strong> ${d.adresse}</p>\n    <p style=\"margin:6px 0\"><strong>Surface :</strong> ${d.surface}m²</p>\n    <p style=\"margin:6px 0\"><strong>Chambres :</strong> ${d.chambres ?? 'NR'}</p>\n    <p style=\"margin:6px 0\"><strong>Année :</strong> ${d.anneeConstruction ?? 'NR'}</p>\n    <p style=\"margin:6px 0\"><strong>État int. :</strong> ${d.etatInterieur}/5 · Communs : ${d.etatCommuns ?? 'N/A'}/5</p>\n    <p style=\"margin:6px 0\"><strong>Extérieurs :</strong> Balcon ${d.surfaceBalcon}m² · Terrasse ${d.surfaceTerrasse}m² · Jardin ${d.surfaceJardin}m²</p>\n    <p style=\"margin:6px 0\"><strong>Parking :</strong> ${d.statInterieur} int. / ${d.statExterieur} ext.</p>\n    <h2 style=\"color:#1a3a5c;font-size:15px;border-bottom:2px solid #f97316;padding-bottom:6px;margin-top:20px\">Estimation IA (Claude Haiku)</h2>\n    <div style=\"background:#f0f9ff;padding:16px;border-radius:8px;border-left:4px solid #f97316\">\n      <p style=\"font-size:22px;font-weight:bold;color:#1a3a5c;margin:0\">${d.prixBasFmt} — ${d.prixHautFmt}</p>\n      <p style=\"color:#6b7280;margin:6px 0 0;font-style:italic;font-size:13px\">${d.commentaire}</p>\n    </div>\n  </div>\n</div></body></html>`;\n\n// ── EMAIL CLIENT ─────────────────────────────────────────────────────\nconst subjectClient = `Votre estimation MERINO – ${d.type} à ${d.adresse.split(',')[0]}`;\nconst htmlClient = `\n<!DOCTYPE html><html><body style=\"margin:0;font-family:Arial,sans-serif;background:#f3f4f6\">\n<div style=\"max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;\">\n  <div style=\"background:#1a3a5c;padding:32px 24px;text-align:center\">\n    <h1 style=\"color:white;margin:0;font-size:26px\">Votre estimation est prête</h1>\n    <p style=\"color:rgba(255,255,255,.7);margin:8px 0 0\">MERINO Immobilier · Grand Nancy</p>\n  </div>\n  <div style=\"padding:32px 24px\">\n    <p style=\"font-size:16px;color:#374151\">Bonjour <strong>${d.prenom}</strong>,</p>\n    <p style=\"color:#6b7280\">Voici la fourchette de marché estimée pour votre <strong>${d.type}</strong> situé au <strong>${d.adresse}</strong> :</p>\n    <div style=\"background:linear-gradient(135deg,#f0f9ff,#e0f2fe);padding:28px;border-radius:12px;text-align:center;margin:24px 0;border:1px solid #bae6fd\">\n      <p style=\"color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px\">Fourchette estimée</p>\n      <p style=\"font-size:30px;font-weight:800;color:#1a3a5c;margin:0\">${d.prixBasFmt}</p>\n      <p style=\"font-size:14px;color:#94a3b8;margin:4px 0\">à</p>\n      <p style=\"font-size:30px;font-weight:800;color:#1a3a5c;margin:0\">${d.prixHautFmt}</p>\n      <p style=\"color:#f97316;font-style:italic;font-size:13px;margin:12px 0 0\">${d.commentaire}</p>\n    </div>\n    <p style=\"color:#6b7280;font-size:14px\">Cette estimation est indicative. Je vous rappelle sous 24h pour organiser une visite et vous proposer une évaluation complète.</p>\n  </div>\n</body></html>`;\n\nreturn [{\n  json: {\n    // Agent\n    subjectAgent,\n    htmlAgent,\n    emailAgent: d.agentEmail,\n    // Client\n    subjectClient,\n    htmlClient,\n    emailClient: d.email,\n    // Forward les données pour les noeuds suivants\n    ...d\n  }\n}];"
       },
-      "id": "aa000001-0007-0007-0007-000000000007",
+      "id": "b7cce0e0-5a54-42f6-858d-3155d1ee33ba",
       "name": "Générer Contenu Emails",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [600, 300]
+      "position": [
+        -192,
+        256
+      ]
     },
     {
       "parameters": {
         "fromEmail": "jordane@agencemerino.com",
         "toEmail": "={{ $json.emailAgent }}",
         "subject": "={{ $json.subjectAgent }}",
-        "emailFormat": "html",
-        "message": "={{ $json.htmlAgent }}",
-        "options": { "appendAttribution": false }
+        "html": "={{ $json.htmlAgent }}",
+        "options": {
+          "appendAttribution": false
+        }
       },
-      "id": "aa000001-0008-0008-0008-000000000008",
+      "id": "fdd006c7-bbd1-45a8-9ca9-3c1caa54f3e5",
       "name": "Email Agent MERINO",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [860, 180],
+      "position": [
+        80,
+        -32
+      ],
+      "webhookId": "bb482259-c9c3-4e75-b37a-532f39b1e586",
       "credentials": {
         "smtp": {
           "id": "DnUbjKpPkd3QpB7d",
@@ -187,16 +222,21 @@
         "operation": "download",
         "fileId": {
           "__rl": true,
-          "value": "={{ $json.agent === 'louis' ? 'REMPLACER_PHOTO_FILE_ID_LOUIS' : '1O-nR69A2Yni4mawAPGK2MOBZpULvp_Bc' }}",
-          "mode": "id"
+          "value": "1eeryluSN5hjFjEfbdqKgmG5sCgI1LXPI",
+          "mode": "list",
+          "cachedResultName": "louisLogo.jpg",
+          "cachedResultUrl": "https://drive.google.com/file/d/1eeryluSN5hjFjEfbdqKgmG5sCgI1LXPI/view?usp=drivesdk"
         },
         "options": {}
       },
-      "id": "aa000001-0009-0009-0009-000000000009",
+      "id": "8d1939ea-f5c0-4005-8a5a-e092848d3e7a",
       "name": "Google Drive - Photo Agent",
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
-      "position": [860, 400],
+      "position": [
+        96,
+        272
+      ],
       "credentials": {
         "googleDriveOAuth2Api": {
           "id": "K4fNPe9eHdsVJfnX",
@@ -208,26 +248,34 @@
       "parameters": {
         "jsCode": "// Adapté de ton SetFooter existant — supporte jordane et louis\nconst emailData = $('Générer Contenu Emails').first().json;\nconst fileId = $input.item.json.id ||\n  (emailData.agent === 'louis' ? 'REMPLACER_PHOTO_FILE_ID_LOUIS' : '1O-nR69A2Yni4mawAPGK2MOBZpULvp_Bc');\n\nconst isLouis = emailData.agent === 'louis';\nconst agentInfo = isLouis\n  ? { name: 'Louis PETITCOLIN', phone: '+33 7 59 59 92 97', email: 'louis@agencemerino.com' }\n  : { name: 'Jordane MOREL',    phone: '+33 6 95 06 73 20', email: 'jordane@agencemerino.com' };\n\nconst firstName = agentInfo.name.split(' ')[0];\nconst lastName  = agentInfo.name.split(' ').slice(1).join(' ');\nconst photoUrl  = `https://drive.google.com/uc?id=${fileId}&export=view`;\n\nconst footerHtml = `\n  <hr style=\"margin-top:32px;border:none;border-top:1px solid #ddd\">\n  <table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\"\n         style=\"width:100%;max-width:600px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#333;line-height:1.4\">\n    <tr>\n      <td style=\"width:90px;vertical-align:top;padding-right:10px\">\n        <img src=\"${photoUrl}\" alt=\"${agentInfo.name}\" width=\"80\" height=\"80\"\n             style=\"display:block;border-radius:50%;border:3px solid #57728c;max-width:80px\">\n      </td>\n      <td style=\"width:220px;vertical-align:top;padding-right:15px\">\n        <p style=\"margin:0 0 4px;font-size:15px;line-height:1.3\">\n          <span style=\"font-weight:normal\">${firstName}</span>\n          <strong style=\"color:#44556e;font-weight:bold\">${lastName}</strong>\n        </p>\n        <p style=\"margin:0 0 2px;font-size:13px;color:#666\">Agent immobilier</p>\n        <p style=\"margin:0;font-size:13px;color:#666\">Co-fondateur | Merino</p>\n      </td>\n      <td style=\"vertical-align:top;padding-left:15px;border-left:2px solid #ddd\">\n        <p style=\"margin:0 0 6px;font-size:13px\">\n          <a href=\"tel:${agentInfo.phone.replace(/\\s/g,'')}\" style=\"color:#333;text-decoration:none\">${agentInfo.phone}</a>\n        </p>\n        <p style=\"margin:0 0 6px;font-size:13px\">\n          <a href=\"mailto:${agentInfo.email}\" style=\"color:#57728c;text-decoration:none\">${agentInfo.email}</a>\n        </p>\n        <p style=\"margin:0 0 6px;font-size:13px\">\n          <a href=\"https://www.agencemerino.com\" style=\"color:#57728c;text-decoration:none\">www.agencemerino.com</a>\n        </p>\n        <p style=\"margin:0;font-size:13px;color:#666\">171 Rue de Newcastle, 54000 Nancy</p>\n      </td>\n    </tr>\n  </table>\n`;\n\nreturn [{ json: { footerHtml } }];"
       },
-      "id": "aa000001-0010-0010-0010-000000000010",
+      "id": "636a2fde-4c0a-4ba8-86c1-33596c8a7285",
       "name": "SetFooter Agent",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1100, 400]
+      "position": [
+        336,
+        272
+      ]
     },
     {
       "parameters": {
         "fromEmail": "jordane@agencemerino.com",
         "toEmail": "={{ $('Générer Contenu Emails').first().json.emailClient }}",
         "subject": "={{ $('Générer Contenu Emails').first().json.subjectClient }}",
-        "emailFormat": "html",
-        "message": "={{ $('Générer Contenu Emails').first().json.htmlClient.replace(/<\\/body\\s*>/i, $('SetFooter Agent').first().json.footerHtml + '</body>') }}",
-        "options": { "appendAttribution": false }
+        "html": "={{ $('Générer Contenu Emails').first().json.htmlClient.replace(/<\\/body\\s*>/i, $('SetFooter Agent').first().json.footerHtml + '</body>') }}",
+        "options": {
+          "appendAttribution": false
+        }
       },
-      "id": "aa000001-0011-0011-0011-000000000011",
+      "id": "55bf35e1-10fc-4f94-af92-773d6c6d5485",
       "name": "Email Client",
       "type": "n8n-nodes-base.emailSend",
       "typeVersion": 2.1,
-      "position": [1340, 400],
+      "position": [
+        576,
+        272
+      ],
+      "webhookId": "f196e592-0832-4da7-ae1e-52ab33f07fcb",
       "credentials": {
         "smtp": {
           "id": "DnUbjKpPkd3QpB7d",
@@ -239,71 +287,192 @@
       "parameters": {
         "respondWith": "json",
         "responseBody": "={{ JSON.stringify({ prixBas: $('Parser Réponse Claude').first().json.prixBas, prixHaut: $('Parser Réponse Claude').first().json.prixHaut, commentaire: $('Parser Réponse Claude').first().json.commentaire }) }}",
-        "options": { "responseCode": 200 }
+        "options": {
+          "responseCode": 200
+        }
       },
-      "id": "aa000001-0012-0012-0012-000000000012",
+      "id": "5749e6f3-56c1-4583-b674-a884a0e2d39f",
       "name": "Répondre au Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1340, 180]
+      "position": [
+        576,
+        48
+      ]
     }
   ],
   "connections": {
     "Webhook MERINO": {
       "main": [
-        [{ "node": "Vérifier Secret", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Vérifier Secret",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Vérifier Secret": {
       "main": [
-        [{ "node": "Claude Haiku - Estimation", "type": "main", "index": 0 }],
-        [{ "node": "Refuser 401", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Rate Limiter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Refuser 401",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limiter": {
+      "main": [
+        [
+          {
+            "node": "Rate Limit Dépassé ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rate Limit Dépassé ?": {
+      "main": [
+        [
+          {
+            "node": "Refuser 429",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Claude Haiku - Estimation",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Claude Haiku - Estimation": {
       "main": [
-        [{ "node": "Parser Réponse Claude", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Parser Réponse Claude",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Parser Réponse Claude": {
       "main": [
         [
-          { "node": "Répondre au Webhook", "type": "main", "index": 0 },
-          { "node": "Google Sheets - Stocker Lead", "type": "main", "index": 0 },
-          { "node": "Générer Contenu Emails", "type": "main", "index": 0 }
+          {
+            "node": "Répondre au Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Générer Contenu Emails",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Générer Contenu Emails": {
       "main": [
         [
-          { "node": "Email Agent MERINO", "type": "main", "index": 0 },
-          { "node": "Google Drive - Photo Agent", "type": "main", "index": 0 }
+          {
+            "node": "Email Agent MERINO",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Drive - Photo Agent",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Google Drive - Photo Agent": {
       "main": [
-        [{ "node": "SetFooter Agent", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "SetFooter Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "SetFooter Agent": {
       "main": [
-        [{ "node": "Email Client", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Email Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
-    },
-    "Google Sheets - Stocker Lead": { "main": [[]] },
-    "Email Agent MERINO": { "main": [[]] },
-    "Email Client": { "main": [[]] },
-    "Répondre au Webhook": { "main": [[]] },
-    "Refuser 401": { "main": [[]] }
+    }
   },
-  "active": false,
-  "settings": { "executionOrder": "v1" },
+  "pinData": {
+    "Webhook MERINO": [
+      {
+        "headers": {
+          "host": "agenceaetheria.com",
+          "user-agent": "node",
+          "content-length": "375",
+          "accept": "*/*",
+          "accept-encoding": "br, gzip, deflate",
+          "accept-language": "*",
+          "content-type": "application/json",
+          "sec-fetch-mode": "cors",
+          "x-forwarded-for": "172.23.0.1",
+          "x-forwarded-host": "agenceaetheria.com",
+          "x-forwarded-port": "443",
+          "x-forwarded-proto": "https",
+          "x-forwarded-server": "31c2ffaf56a0",
+          "x-real-ip": "172.23.0.1",
+          "x-webhook-secret": "w6P3Hyntdupo2zlcJ7uLvyuKey2tTwUafjpBThQL"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "type": "maison",
+          "adresse": "1 Rue Laennec 54410 Laneuveville-devant-Nancy",
+          "surface": 105,
+          "chambres": 4,
+          "surfaceJardin": 400,
+          "surfaceTerrasse": 20,
+          "statInterieur": "1",
+          "statExterieur": "2",
+          "anneeConstruction": 2004,
+          "etatInterieur": "3",
+          "etatCommuns": "3",
+          "nom": "beroual",
+          "prenom": "baptiste",
+          "email": "beroual.baptiste@gmail.com",
+          "telephone": "0658214819",
+          "agent": "louis",
+          "consent": true
+        },
+        "webhookUrl": "https://agenceaetheria.com/webhook/merino-lead",
+        "executionMode": "production"
+      }
+    ]
+  },
   "meta": {
-    "templateCredsSetupCompleted": false,
     "instanceId": "223514caa351ca4e46c3b7978d620dbcf7cb412efd0057cb31ea7ffade5c8b3e"
-  },
-  "id": "merino-lead-workflow",
-  "tags": [{ "name": "MERINO" }]
+  }
 }
