@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Download, Lock, PhoneCall, ShieldCheck } from "lucide-react";
+import { Download, LockOpen, PhoneCall, ShieldCheck } from "lucide-react";
 
 export type EstimationData = {
   prenom: string;
@@ -145,11 +145,11 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
 
         <div className="mt-8 bg-white rounded-3xl p-6 md:p-8 shadow-xl flex flex-col md:flex-row items-center gap-6 border-l-8 border-merino-blue transform hover:scale-[1.01] transition-transform">
           <div className="w-16 h-16 bg-merino-blue/5 rounded-2xl flex items-center justify-center text-merino-blue shrink-0">
-            <Lock size={32} />
+            <LockOpen size={32} />
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h3 className="font-extrabold text-xl text-merino-blue">Methode / Guide</h3>
-            <p className="text-gray-500 mt-1 font-medium">Telechargez des maintenant notre guide pour vendre vite et au bon prix.</p>
+            <h3 className="font-extrabold text-xl text-merino-blue">Méthode / Guide</h3>
+            <p className="text-gray-500 mt-1 font-medium">Téléchargez dés maintenant notre guide pour vendre vite et au bon prix.</p>
           </div>
           <a
             href="/guide_merino.pdf"
@@ -157,7 +157,7 @@ export default function ConfirmationClient({ data }: { data: EstimationData }) {
             className="w-full md:w-auto bg-merino-blue text-white px-8 py-4 rounded-xl font-bold hover:bg-merino-blue-dark transition-colors shrink-0 shadow-md flex items-center justify-center gap-2"
           >
             <Download size={18} />
-            Telecharger le guide
+            Télécharger notre guide
           </a>
         </div>
 
