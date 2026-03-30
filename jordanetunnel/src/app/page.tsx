@@ -167,10 +167,11 @@ export default function Home() {
           </div>
           <div className="text-sm border-t border-gray-800 pt-8 flex flex-col items-center gap-2">
             <p>Vos données ne seront jamais transmises à des tiers.</p>
-            <p>© 2026 MERINO - Nancy. Tous droits réservés.</p>
+            <p>© 2026 MERINO - Nancy. Tous droits reserves.</p>
+            <p className="text-gray-500 text-xs mt-1">Developpe par AetherIA</p>
             <div className="flex flex-wrap justify-center gap-4 mt-4">
-              <Link href="#" className="hover:text-white transition-colors">Mentions légales liées au site</Link>
-              <Link href="#" className="hover:text-white transition-colors">Politique de confidentialité</Link>
+              <Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions legales</Link>
+              <Link href="/confidentialite" className="hover:text-white transition-colors">Politique de confidentialite</Link>
             </div>
           </div>
         </div>
